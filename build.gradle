@@ -1,0 +1,22 @@
+plugins {
+  id 'java'
+  id 'application'
+}
+
+mainClassName = ' org.erossi.syncFile2EXIF.syncFile2EXIF'
+
+dependencies {
+  compile 'com.google.guava:guava:23.0'  
+  compile 'com.drewnoakes:metadata-extractor:2.11.0'
+
+  testCompile 'commons-io:commons-io:2.6'  
+  testCompile 'junit:junit:4.12'
+}
+
+test {
+  testLogging.showStandardStreams = true
+}
+
+repositories {    
+  jcenter()
+}
