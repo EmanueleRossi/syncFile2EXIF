@@ -23,7 +23,7 @@ def getGitShortHash = { ->
 jar {
   manifest {
     attributes (
-      'Main-Class': 'org.erossi.syncFile2EXIF.syncFile2EXIF',
+      'Main-Class': 'org.erossi.syncFile2EXIF.SyncFile2EXIF',
       'Git-Hash': getGitShortHash()
     )  
   }

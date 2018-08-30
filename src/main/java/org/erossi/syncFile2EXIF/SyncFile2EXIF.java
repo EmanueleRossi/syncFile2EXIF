@@ -28,7 +28,7 @@ public class SyncFile2EXIF {
 
       SyncFile2EXIF main = new SyncFile2EXIF();
       String gitHash = new String();
-      try (JarInputStream jIS = new JarInputStream(Thread.currentThread().getContextClassLoader().getResource(JarFile.MANIFEST_NAME).openStream())) {
+      try (JarInputStream jIS = new JarInputStream(main.getClass().getProtectionDomain().getCodeSource().getLocation().openStream())) {
         gitHash = jIS.getManifest().getMainAttributes().getValue("Git-Hash");
       } catch (Exception e) {
         gitHash = "...under development ;)";                
