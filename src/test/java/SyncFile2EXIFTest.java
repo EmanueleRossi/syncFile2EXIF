@@ -1,9 +1,14 @@
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Instant;
 
 import org.apache.commons.io.FileUtils;
 import org.erossi.syncFile2EXIF.SyncFile2EXIF;
@@ -45,13 +50,15 @@ public class SyncFile2EXIFTest {
   }  
 
   @Test
-  public void testSample01() throws IOException {
+  public void testSample01() throws Exception {
 
-    //File copy = testFolder.newFile("test-01.jpg");
-    File copy = new File(".\\build\\resources\\test\\test-012.jpg");
-  
+    File copy = testFolder.newFile("test-01.jpg");  
     FileUtils.copyFile(new File(".\\build\\resources\\test\\sample-01.jpg"), copy);
+
     tmc.syncTimes(copy);
+
+    BasicFileAttributes attr = Files.readAttributes(Paths.get(copy.getAbsolutePath()), BasicFileAttributes.class); 
+    assertEquals(Instant.parse("2016-07-10T14:53:51Z"), attr.creationTime().toInstant()); 
   }
 }
 

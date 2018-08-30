@@ -11,7 +11,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.TimeZone;
 import java.util.stream.StreamSupport;
 
 import com.drew.imaging.ImageMetadataReader;
@@ -38,7 +40,8 @@ public class  SyncFile2EXIF {
         if (o_dateTime.isPresent()) {
           String exifDateTimeString = o_dateTime.get().getDescription();
           //System.out.println(exifDateTimeString);
-          DateFormat exifDateTimeStringFormat = new SimpleDateFormat("yyyy:mm:dd hh:mm:ss");                    
+          DateFormat exifDateTimeStringFormat = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");  
+          exifDateTimeStringFormat.setTimeZone(TimeZone.getTimeZone("UTC"));                  
           Date exifDateTime = exifDateTimeStringFormat.parse(exifDateTimeString); 
 
           BasicFileAttributeView inputFileView = Files.getFileAttributeView(Paths.get(inputFile.getAbsolutePath()), BasicFileAttributeView.class);
