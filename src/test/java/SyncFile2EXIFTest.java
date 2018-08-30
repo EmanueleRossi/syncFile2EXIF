@@ -74,8 +74,8 @@ public class SyncFile2EXIFTest {
   public void testMain_Times() throws Exception {
     File copy = testFolder.newFile("test-02.jpg"); 
     FileUtils.copyFile(new File(".\\build\\resources\\test\\sample-01.jpg"), copy);    
-    
-    SyncFile2EXIF.main(new String[] { "times", copy.getAbsolutePath()});
+
+    SyncFile2EXIF.main(new String[] { "times", copy.getParentFile().getAbsolutePath(), "*.jpg"});
 
     BasicFileAttributes attr = Files.readAttributes(Paths.get(copy.getAbsolutePath()), BasicFileAttributes.class); 
     assertEquals(Instant.parse("2016-07-10T14:53:51Z"), attr.creationTime().toInstant());     

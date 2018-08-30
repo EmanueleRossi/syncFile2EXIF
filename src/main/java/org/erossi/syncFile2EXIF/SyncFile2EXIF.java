@@ -1,7 +1,6 @@
 package org.erossi.syncFile2EXIF;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -16,7 +15,6 @@ import java.util.Optional;
 import java.util.TimeZone;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
-import java.util.regex.Pattern;
 import java.util.stream.StreamSupport;
 
 import com.drew.imaging.ImageMetadataReader;
@@ -30,8 +28,7 @@ public class SyncFile2EXIF {
 
       SyncFile2EXIF main = new SyncFile2EXIF();
       String gitHash = new String();
-      try {
-        JarInputStream jIS = new JarInputStream(Thread.currentThread().getContextClassLoader().getResource(JarFile.MANIFEST_NAME).openStream());
+      try (JarInputStream jIS = new JarInputStream(Thread.currentThread().getContextClassLoader().getResource(JarFile.MANIFEST_NAME).openStream())) {
         gitHash = jIS.getManifest().getMainAttributes().getValue("Git-Hash");
       } catch (Exception e) {
         gitHash = "...under development ;)";                
@@ -41,25 +38,21 @@ public class SyncFile2EXIF {
       if (args[0].equalsIgnoreCase("help")) {
         System.out.format("\tUsage: java -jar <jarFileName> [command] [parameters]\n");
         System.out.format("\t\t [command] = help, time\n");   
-        System.out.format("\t\t ex.: java -jar <jarFileName> time *.jpg\b");               
+        System.out.format("\t\t ex.: java -jar <jarFileName> time . *.jpg\b");               
       }
       if (args[0].equalsIgnoreCase("times")) {
-        if (args.length < 2 || args[1].isEmpty()) {
+        if (args.length < 3 || args[1].isEmpty() || args[2].isEmpty()) {
           System.out.format("\tNo file(s) specified... try \"help\" command for instructions.\n");
         } else {
-          Pattern filePattern = Pattern.compile(args[1].replace("\\", "/"));
-          File[] filesList = new File("").listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File directory, String fileName) {
-                return filePattern.matcher(fileName).matches();
-            }
-          });
-          //Arrays.stream(filesList).forEach(f -> System.out.println(f));               
-          Arrays.stream(filesList).forEach(f -> main.syncTimes(f));          
+          File inputDir = new File(args[1]);
+          String filePattern = args[2].replace("*", "");
+          Arrays.stream(inputDir.listFiles())
+            .filter(f -> f.getName().contains(filePattern))
+            .forEach(f -> main.syncTimes(f));
         }
       }      
     }
-    
+
     public void syncTimes(File inputFile) {
       try { 
         Metadata metadata = ImageMetadataReader.readMetadata(inputFile);      
