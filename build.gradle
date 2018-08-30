@@ -3,14 +3,30 @@ plugins {
   id 'application'
 }
 
-mainClassName = ' org.erossi.syncFile2EXIF.syncFile2EXIF'
-
 dependencies {
   compile 'com.google.guava:guava:23.0'  
   compile 'com.drewnoakes:metadata-extractor:2.11.0'
 
   testCompile 'commons-io:commons-io:2.6'  
   testCompile 'junit:junit:4.12'
+}
+
+def getGitShortHash = { ->
+  def stdout = new ByteArrayOutputStream()
+  exec {
+    commandLine 'git', 'rev-parse', '--short', 'HEAD'
+    standardOutput = stdout
+  }
+  return stdout.toString().trim()
+}
+
+jar {
+  manifest {
+    attributes (
+      'Main-Class': 'org.erossi.syncFile2EXIF.syncFile2EXIF',
+      'Git-Hash': getGitShortHash()
+    )
+  }
 }
 
 test {

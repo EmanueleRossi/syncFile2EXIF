@@ -51,7 +51,6 @@ public class SyncFile2EXIFTest {
 
   @Test
   public void testSample01() throws Exception {
-
     File copy = testFolder.newFile("test-01.jpg");  
     FileUtils.copyFile(new File(".\\build\\resources\\test\\sample-01.jpg"), copy);
 
@@ -59,6 +58,27 @@ public class SyncFile2EXIFTest {
 
     BasicFileAttributes attr = Files.readAttributes(Paths.get(copy.getAbsolutePath()), BasicFileAttributes.class); 
     assertEquals(Instant.parse("2016-07-10T14:53:51Z"), attr.creationTime().toInstant()); 
+  }
+
+  @Test
+  public void testMain_Help() {
+    SyncFile2EXIF.main(new String[] { "help" });
+  }
+
+  @Test
+  public void testMain_TimesNoFiles() {
+    SyncFile2EXIF.main(new String[] { "times" });     
+  }
+  
+  @Test
+  public void testMain_Times() throws Exception {
+    File copy = testFolder.newFile("test-02.jpg"); 
+    FileUtils.copyFile(new File(".\\build\\resources\\test\\sample-01.jpg"), copy);    
+    
+    SyncFile2EXIF.main(new String[] { "times", copy.getAbsolutePath()});
+
+    BasicFileAttributes attr = Files.readAttributes(Paths.get(copy.getAbsolutePath()), BasicFileAttributes.class); 
+    assertEquals(Instant.parse("2016-07-10T14:53:51Z"), attr.creationTime().toInstant());     
   }
 }
 

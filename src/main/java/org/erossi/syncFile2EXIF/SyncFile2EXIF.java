@@ -1,6 +1,7 @@
 package org.erossi.syncFile2EXIF;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -9,26 +10,58 @@ import java.nio.file.attribute.FileTime;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
+import java.util.regex.Pattern;
 import java.util.stream.StreamSupport;
 
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
 
-public class  SyncFile2EXIF {
+public class SyncFile2EXIF {
 
-    public static void main(String[] args) {   
+    public static void main(String[] args) {  
+
+      SyncFile2EXIF main = new SyncFile2EXIF();
+      String gitHash = new String();
+      try {
+        JarInputStream jIS = new JarInputStream(Thread.currentThread().getContextClassLoader().getResource(JarFile.MANIFEST_NAME).openStream());
+        gitHash = jIS.getManifest().getMainAttributes().getValue("Git-Hash");
+      } catch (Exception e) {
+        gitHash = "...under development ;)";                
+      } 
+      System.out.format("### SyncFile2EXIF ### - Version %s\n", gitHash);
+
+      if (args[0].equalsIgnoreCase("help")) {
+        System.out.format("\tUsage: java -jar <jarFileName> [command] [parameters]\n");
+        System.out.format("\t\t [command] = help, time\n");   
+        System.out.format("\t\t ex.: java -jar <jarFileName> time *.jpg\b");               
+      }
+      if (args[0].equalsIgnoreCase("times")) {
+        if (args.length < 2 || args[1].isEmpty()) {
+          System.out.format("\tNo file(s) specified... try \"help\" command for instructions.\n");
+        } else {
+          Pattern filePattern = Pattern.compile(args[1].replace("\\", "/"));
+          File[] filesList = new File("").listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File directory, String fileName) {
+                return filePattern.matcher(fileName).matches();
+            }
+          });
+          //Arrays.stream(filesList).forEach(f -> System.out.println(f));               
+          Arrays.stream(filesList).forEach(f -> main.syncTimes(f));          
+        }
+      }      
     }
     
     public void syncTimes(File inputFile) {
-      try {
+      try { 
         Metadata metadata = ImageMetadataReader.readMetadata(inputFile);      
         Optional<Tag> o_dateTime = StreamSupport.stream(metadata.getDirectories().spliterator(), false)
           .flatMap(d -> d.getTags().stream())
