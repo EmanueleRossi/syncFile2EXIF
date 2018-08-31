@@ -29,6 +29,8 @@ public class SyncFile2EXIFTest {
   public static void initTest() {
     FileUtils.deleteQuietly(new File(".\\build\\resources\\test\\NonExistentFile.jpg"));
     FileUtils.deleteQuietly(new File(".\\build\\resources\\test\\test-01.jpg"));
+    FileUtils.deleteQuietly(new File(".\\build\\resources\\test\\test-02.jpg"));
+    FileUtils.deleteQuietly(new File(".\\build\\resources\\test\\test-03.jpg"));    
     tmc = new SyncFile2EXIF();
   }
 
@@ -50,14 +52,24 @@ public class SyncFile2EXIFTest {
   }  
 
   @Test
-  public void testSample01() throws Exception {
-    File copy = testFolder.newFile("test-01.jpg");  
-    FileUtils.copyFile(new File(".\\build\\resources\\test\\sample-01.jpg"), copy);
+  public void testSamples() throws Exception {
+    File copy01 = testFolder.newFile("test-01.jpg");  
+    FileUtils.copyFile(new File(".\\build\\resources\\test\\sample-01.jpg"), copy01);
+    tmc.syncTimes(copy01);
+    BasicFileAttributes attr01 = Files.readAttributes(Paths.get(copy01.getAbsolutePath()), BasicFileAttributes.class); 
+    assertEquals(Instant.parse("2016-07-10T14:53:51Z"), attr01.creationTime().toInstant()); 
 
-    tmc.syncTimes(copy);
+    File copy02 = testFolder.newFile("test-02.jpg");  
+    FileUtils.copyFile(new File(".\\build\\resources\\test\\sample-02.jpg"), copy02);
+    tmc.syncTimes(copy02);
+    BasicFileAttributes attr02 = Files.readAttributes(Paths.get(copy02.getAbsolutePath()), BasicFileAttributes.class); 
+    assertEquals(Instant.parse("2013-10-06T15:38:59Z"), attr02.creationTime().toInstant()); 
 
-    BasicFileAttributes attr = Files.readAttributes(Paths.get(copy.getAbsolutePath()), BasicFileAttributes.class); 
-    assertEquals(Instant.parse("2016-07-10T14:53:51Z"), attr.creationTime().toInstant()); 
+    File copy03 = testFolder.newFile("test-03.jpg");  
+    FileUtils.copyFile(new File(".\\build\\resources\\test\\sample-03.jpg"), copy03);    
+    tmc.syncTimes(copy03);
+    BasicFileAttributes attr03 = Files.readAttributes(Paths.get(copy03.getAbsolutePath()), BasicFileAttributes.class); 
+    assertEquals(Instant.parse("2013-10-06T15:38:50Z"), attr03.creationTime().toInstant()); 
   }
 
   @Test
@@ -72,13 +84,21 @@ public class SyncFile2EXIFTest {
   
   @Test
   public void testMain_Times() throws Exception {
-    File copy = testFolder.newFile("test-02.jpg"); 
-    FileUtils.copyFile(new File(".\\build\\resources\\test\\sample-01.jpg"), copy);    
+    File copy01 = testFolder.newFile("test-01.jpg");  
+    FileUtils.copyFile(new File(".\\build\\resources\\test\\sample-01.jpg"), copy01);   
+    File copy02 = testFolder.newFile("test-02.jpg");  
+    FileUtils.copyFile(new File(".\\build\\resources\\test\\sample-02.jpg"), copy02);    
+    File copy03 = testFolder.newFile("test-03.jpg");  
+    FileUtils.copyFile(new File(".\\build\\resources\\test\\sample-03.jpg"), copy03);    
 
-    SyncFile2EXIF.main(new String[] { "times", copy.getParentFile().getAbsolutePath(), "*.jpg"});
+    SyncFile2EXIF.main(new String[] { "times", testFolder.getRoot().getAbsolutePath(), "*.jpg"});
 
-    BasicFileAttributes attr = Files.readAttributes(Paths.get(copy.getAbsolutePath()), BasicFileAttributes.class); 
-    assertEquals(Instant.parse("2016-07-10T14:53:51Z"), attr.creationTime().toInstant());     
+    BasicFileAttributes attr01 = Files.readAttributes(Paths.get(copy01.getAbsolutePath()), BasicFileAttributes.class); 
+    assertEquals(Instant.parse("2016-07-10T14:53:51Z"), attr01.creationTime().toInstant());    
+    BasicFileAttributes attr02 = Files.readAttributes(Paths.get(copy02.getAbsolutePath()), BasicFileAttributes.class); 
+    assertEquals(Instant.parse("2013-10-06T15:38:59Z"), attr02.creationTime().toInstant()); 
+    BasicFileAttributes attr03 = Files.readAttributes(Paths.get(copy03.getAbsolutePath()), BasicFileAttributes.class); 
+    assertEquals(Instant.parse("2013-10-06T15:38:50Z"), attr03.creationTime().toInstant());     
   }
 }
 
