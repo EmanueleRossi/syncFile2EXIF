@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
 import java.util.TimeZone;
-import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 import java.util.stream.StreamSupport;
 
@@ -55,22 +54,9 @@ public class SyncFile2EXIF {
     }
 
     public void syncTimes(File inputFile) {
-      try { 
-        Metadata metadata = ImageMetadataReader.readMetadata(inputFile);      
-        Optional<Tag> o_dateTime = StreamSupport.stream(metadata.getDirectories().spliterator(), false)
-          .flatMap(d -> d.getTags().stream())
-          .distinct()
-          //.forEach(t -> System.out.format("[%s] = |%s|\n", t.getTagName(), t.getDescription()));
-          .filter(t -> t.getTagName().equalsIgnoreCase("Date/Time Original"))
-          .findFirst();         
-
-        if (o_dateTime.isPresent()) {
-          String exifDateTimeString = o_dateTime.get().getDescription();
-          //System.out.println(exifDateTimeString);
-          DateFormat exifDateTimeStringFormat = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");  
-          exifDateTimeStringFormat.setTimeZone(TimeZone.getTimeZone("UTC"));                  
-          Date exifDateTime = exifDateTimeStringFormat.parse(exifDateTimeString); 
-
+      try {        
+        Date exifDateTime = this.getEXIFOriginalDateTime(inputFile);
+        if (exifDateTime != null) {          
           BasicFileAttributeView inputFileView = Files.getFileAttributeView(Paths.get(inputFile.getAbsolutePath()), BasicFileAttributeView.class);
           inputFileView.setTimes(FileTime.fromMillis(exifDateTime.getTime()), FileTime.fromMillis(exifDateTime.getTime()), FileTime.fromMillis(exifDateTime.getTime()));
         } else {
@@ -84,6 +70,22 @@ public class SyncFile2EXIF {
         System.err.format("%s %s |%s|", "ERROR! Getting Date/Time :(", pe, inputFile.getAbsolutePath());       
       }
     }
+
+    private Date getEXIFOriginalDateTime(File f) throws ImageProcessingException, IOException, ParseException {
+      Date exifDateTime = null;
+      Metadata metadata = ImageMetadataReader.readMetadata(f);      
+      Optional<Tag> o_dateTime = StreamSupport.stream(metadata.getDirectories().spliterator(), false)
+        .flatMap(d -> d.getTags().stream())
+        .distinct()
+        //.forEach(t -> System.out.format("[%s] = |%s|\n", t.getTagName(), t.getDescription()));
+        .filter(t -> t.getTagName().equalsIgnoreCase("Date/Time Original"))
+        .findFirst();    
+      if (o_dateTime.isPresent()) {
+        String exifDateTimeString = o_dateTime.get().getDescription();
+        DateFormat exifDateTimeStringFormat = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");  
+        exifDateTimeStringFormat.setTimeZone(TimeZone.getTimeZone("UTC"));                  
+        exifDateTime = exifDateTimeStringFormat.parse(exifDateTimeString);         
+      }
+      return exifDateTime;
+    }
 }
-
-

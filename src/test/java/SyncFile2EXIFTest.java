@@ -57,19 +57,25 @@ public class SyncFile2EXIFTest {
     FileUtils.copyFile(new File(".\\build\\resources\\test\\sample-01.jpg"), copy01);
     tmc.syncTimes(copy01);
     BasicFileAttributes attr01 = Files.readAttributes(Paths.get(copy01.getAbsolutePath()), BasicFileAttributes.class); 
+    assertEquals(Instant.parse("2016-07-10T14:53:51Z"), attr01.lastModifiedTime().toInstant()); 
+    assertEquals(Instant.parse("2016-07-10T14:53:51Z"), attr01.lastAccessTime().toInstant()); 
     assertEquals(Instant.parse("2016-07-10T14:53:51Z"), attr01.creationTime().toInstant()); 
 
     File copy02 = testFolder.newFile("test-02.jpg");  
     FileUtils.copyFile(new File(".\\build\\resources\\test\\sample-02.jpg"), copy02);
     tmc.syncTimes(copy02);
     BasicFileAttributes attr02 = Files.readAttributes(Paths.get(copy02.getAbsolutePath()), BasicFileAttributes.class); 
+    assertEquals(Instant.parse("2013-10-06T15:38:59Z"), attr02.lastModifiedTime().toInstant());     
+    assertEquals(Instant.parse("2013-10-06T15:38:59Z"), attr02.lastAccessTime().toInstant()); 
     assertEquals(Instant.parse("2013-10-06T15:38:59Z"), attr02.creationTime().toInstant()); 
 
     File copy03 = testFolder.newFile("test-03.jpg");  
     FileUtils.copyFile(new File(".\\build\\resources\\test\\sample-03.jpg"), copy03);    
     tmc.syncTimes(copy03);
     BasicFileAttributes attr03 = Files.readAttributes(Paths.get(copy03.getAbsolutePath()), BasicFileAttributes.class); 
-    assertEquals(Instant.parse("2013-10-06T15:38:50Z"), attr03.creationTime().toInstant()); 
+    assertEquals(Instant.parse("2013-10-06T15:38:50Z"), attr03.lastModifiedTime().toInstant()); 
+    assertEquals(Instant.parse("2013-10-06T15:38:50Z"), attr03.lastAccessTime().toInstant()); 
+    assertEquals(Instant.parse("2013-10-06T15:38:50Z"), attr03.creationTime().toInstant());         
   }
 
   @Test
@@ -94,11 +100,17 @@ public class SyncFile2EXIFTest {
     SyncFile2EXIF.main(new String[] { "times", testFolder.getRoot().getAbsolutePath(), "*.jpg"});
 
     BasicFileAttributes attr01 = Files.readAttributes(Paths.get(copy01.getAbsolutePath()), BasicFileAttributes.class); 
-    assertEquals(Instant.parse("2016-07-10T14:53:51Z"), attr01.creationTime().toInstant());    
+    assertEquals(Instant.parse("2016-07-10T14:53:51Z"), attr01.lastModifiedTime().toInstant());    
+    assertEquals(Instant.parse("2016-07-10T14:53:51Z"), attr01.lastAccessTime().toInstant()); 
+    assertEquals(Instant.parse("2016-07-10T14:53:51Z"), attr01.creationTime().toInstant());         
     BasicFileAttributes attr02 = Files.readAttributes(Paths.get(copy02.getAbsolutePath()), BasicFileAttributes.class); 
-    assertEquals(Instant.parse("2013-10-06T15:38:59Z"), attr02.creationTime().toInstant()); 
+    assertEquals(Instant.parse("2013-10-06T15:38:59Z"), attr02.lastModifiedTime().toInstant()); 
+    assertEquals(Instant.parse("2013-10-06T15:38:59Z"), attr02.lastAccessTime().toInstant()); 
+    assertEquals(Instant.parse("2013-10-06T15:38:59Z"), attr02.creationTime().toInstant());         
     BasicFileAttributes attr03 = Files.readAttributes(Paths.get(copy03.getAbsolutePath()), BasicFileAttributes.class); 
-    assertEquals(Instant.parse("2013-10-06T15:38:50Z"), attr03.creationTime().toInstant());     
+    assertEquals(Instant.parse("2013-10-06T15:38:50Z"), attr03.lastModifiedTime().toInstant());    
+    assertEquals(Instant.parse("2013-10-06T15:38:50Z"), attr03.lastAccessTime().toInstant());   
+    assertEquals(Instant.parse("2013-10-06T15:38:50Z"), attr03.creationTime().toInstant());             
   }
 }
 
