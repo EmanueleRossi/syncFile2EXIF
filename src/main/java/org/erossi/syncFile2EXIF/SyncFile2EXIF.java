@@ -23,7 +23,6 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
 
 import org.apache.commons.io.FilenameUtils;
-import com.google.common.base.Strings;
 
 public class SyncFile2EXIF {
 
@@ -94,7 +93,7 @@ public class SyncFile2EXIF {
         if (exifDateTime != null) {
           String newNameBase = new SimpleDateFormat("yyyyMMddHHmmss").format(exifDateTime);
           String inputFileExtension = FilenameUtils.getExtension(inputFile.getAbsolutePath());
-          if (Strings.isNullOrEmpty(inputFileExtension)) {
+          if (inputFileExtension == null | inputFileExtension == "") {
             inputFileExtension = "";
           } else {
             inputFileExtension = ".".concat(inputFileExtension);

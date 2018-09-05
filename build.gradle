@@ -3,8 +3,9 @@ plugins {
   id 'application'
 }
 
+mainClassName = 'org.erossi.syncFile2EXIF.SyncFile2EXIF'
+
 dependencies {
-  compile 'com.google.guava:guava:23.0'  
   compile 'com.drewnoakes:metadata-extractor:2.11.0'
   compile 'commons-io:commons-io:2.6'  
 
