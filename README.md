@@ -3,8 +3,10 @@ Syncronizes file attributes, for pics, with corresponding information from EXIF 
  `````
  Usage: java -jar <jarFileName> [command] [parameters]
   [command] -> help
-  [command] -> time java -jar <jarFileName> time <directory> <fileNamePattern>
-    ex.: java -jar <jarFileName> time . *.jpg
+  [command] -> time java -jar <jarFileName> times <directory> <fileNamePattern>
+    ex.: java -jar <jarFileName> times . *.jpg
+  [command] -> name java -jar <jarFileName> name <directory> <fileNamePattern>
+    ex.: java -jar <jarFileName> name . *.jpg
  ````` 
 Please, feel free to contact me for any question, including bugs ;) or feature request.
 
