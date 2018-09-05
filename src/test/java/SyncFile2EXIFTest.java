@@ -1,5 +1,6 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -9,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
+import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
 import org.erossi.syncFile2EXIF.SyncFile2EXIF;
@@ -112,6 +114,15 @@ public class SyncFile2EXIFTest {
     assertEquals(Instant.parse("2013-10-06T15:38:50Z"), attr03.lastAccessTime().toInstant());   
     assertEquals(Instant.parse("2013-10-06T15:38:50Z"), attr03.creationTime().toInstant());             
   }
+
+  @Test
+  public void testMain_Name() throws Exception {
+    File copy01 = testFolder.newFile("test-01.jpg");  
+    FileUtils.copyFile(new File(".\\build\\resources\\test\\sample-01.jpg"), copy01);       
+
+    SyncFile2EXIF.main(new String[] { "name", testFolder.getRoot().getAbsolutePath(), copy01.getName()});
+
+    File outputFile = Arrays.stream(testFolder.getRoot().listFiles()).findFirst().get();
+    assertTrue(outputFile.getName().equalsIgnoreCase("20160710165351.jpg"));
+  }
 }
-
-

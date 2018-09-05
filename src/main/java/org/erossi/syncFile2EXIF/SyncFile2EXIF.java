@@ -3,6 +3,7 @@ package org.erossi.syncFile2EXIF;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.FileTime;
@@ -21,6 +22,9 @@ import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
 
+import org.apache.commons.io.FilenameUtils;
+import com.google.common.base.Strings;
+
 public class SyncFile2EXIF {
 
     public static void main(String[] args) {  
@@ -37,8 +41,10 @@ public class SyncFile2EXIF {
       if (args[0].equalsIgnoreCase("help")) {
         System.out.format("\tUsage: java -jar <jarFileName> [command] [parameters]\n");
         System.out.format("\t\t [command] -> help\n");   
-        System.out.format("\t\t [command] -> time java -jar <jarFileName> time <directory> <fileNamePattern>\n");   
-        System.out.format("\t\t\t ex.: java -jar <jarFileName> time . *.jpg\b");               
+        System.out.format("\t\t [command] -> times java -jar <jarFileName> times <directory> <fileNamePattern>\n");   
+        System.out.format("\t\t\t ex.: java -jar <jarFileName> times . *.jpg\n");     
+        System.out.format("\t\t [command] -> name java -jar <jarFileName> name <directory> <fileNamePattern>\n");   
+        System.out.format("\t\t\t ex.: java -jar <jarFileName> name . *.jpg\n");                        
       }
       if (args[0].equalsIgnoreCase("times")) {
         if (args.length < 3 || args[1].isEmpty() || args[2].isEmpty()) {
@@ -50,7 +56,18 @@ public class SyncFile2EXIF {
             .filter(f -> f.getName().contains(filePattern))
             .forEach(f -> main.syncTimes(f));
         }
-      }      
+      }    
+      if (args[0].equalsIgnoreCase("name")) {
+        if (args.length < 3 || args[1].isEmpty() || args[2].isEmpty()) {
+          System.out.format("\tNo file(s) specified... try \"help\" command for instructions.\n");
+        } else {
+          File inputDir = new File(args[1]);
+          String filePattern = args[2].replace("*", "");
+          Arrays.stream(inputDir.listFiles())
+            .filter(f -> f.getName().contains(filePattern))
+            .forEach(f -> main.syncName(f));
+        }
+      }        
     }
 
     public void syncTimes(File inputFile) {
@@ -59,6 +76,31 @@ public class SyncFile2EXIF {
         if (exifDateTime != null) {          
           BasicFileAttributeView inputFileView = Files.getFileAttributeView(Paths.get(inputFile.getAbsolutePath()), BasicFileAttributeView.class);
           inputFileView.setTimes(FileTime.fromMillis(exifDateTime.getTime()), FileTime.fromMillis(exifDateTime.getTime()), FileTime.fromMillis(exifDateTime.getTime()));
+        } else {
+          System.out.format("%s |%s| %s |%s|", "Cannot find \"Date/Time Original\" tag into EXIF metadata of file", inputFile.getAbsolutePath());          
+        }
+      } catch (IOException ioe) {
+        System.err.format("%s %s |%s|", "ERROR! Reading file :(", ioe, inputFile.getAbsolutePath());        
+      } catch (ImageProcessingException ipe) {
+        System.err.format("%s %s |%s|", "ERROR! Getting Image Metadata :(", ipe, inputFile.getAbsolutePath());       
+      } catch (ParseException pe) {
+        System.err.format("%s %s |%s|", "ERROR! Getting Date/Time :(", pe, inputFile.getAbsolutePath());       
+      }
+    }
+
+    public void syncName(File inputFile) {
+      try {
+        Date exifDateTime = this.getEXIFOriginalDateTime(inputFile);
+        if (exifDateTime != null) {
+          String newNameBase = new SimpleDateFormat("yyyyMMddHHmmss").format(exifDateTime);
+          String inputFileExtension = FilenameUtils.getExtension(inputFile.getAbsolutePath());
+          if (Strings.isNullOrEmpty(inputFileExtension)) {
+            inputFileExtension = "";
+          } else {
+            inputFileExtension = ".".concat(inputFileExtension);
+          }
+          Path inputFilePath = Paths.get(inputFile.getAbsolutePath());
+          Files.move(inputFilePath, inputFilePath.resolveSibling(newNameBase.concat(inputFileExtension)));
         } else {
           System.out.format("%s |%s| %s |%s|", "Cannot find \"Date/Time Original\" tag into EXIF metadata of file", inputFile.getAbsolutePath());          
         }

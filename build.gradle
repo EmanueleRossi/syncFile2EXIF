@@ -6,8 +6,8 @@ plugins {
 dependencies {
   compile 'com.google.guava:guava:23.0'  
   compile 'com.drewnoakes:metadata-extractor:2.11.0'
+  compile 'commons-io:commons-io:2.6'  
 
-  testCompile 'commons-io:commons-io:2.6'  
   testCompile 'junit:junit:4.12'
 }
 
