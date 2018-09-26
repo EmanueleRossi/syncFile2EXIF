@@ -37,7 +37,7 @@ public class SyncFile2EXIF {
       } 
       System.out.format("### SyncFile2EXIF ### - Version %s\n", gitHash);
 
-      if (args[0].equalsIgnoreCase("help")) {
+      if (args[0].contains("help")) {
         System.out.format("\tUsage: java -jar <jarFileName> [command] [parameters]\n");
         System.out.format("\t\t [command] -> help\n");   
         System.out.format("\t\t [command] -> times java -jar <jarFileName> times <directory> <fileNamePattern>\n");   
@@ -45,23 +45,23 @@ public class SyncFile2EXIF {
         System.out.format("\t\t [command] -> name java -jar <jarFileName> name <directory> <fileNamePattern>\n");   
         System.out.format("\t\t\t ex.: java -jar <jarFileName> name . *.jpg\n");                        
       }
-      if (args[0].equalsIgnoreCase("times")) {
+      if (args[0].contains("times")) {
         if (args.length < 3 || args[1].isEmpty() || args[2].isEmpty()) {
           System.out.format("\tNo file(s) specified... try \"help\" command for instructions.\n");
         } else {
           File inputDir = new File(args[1]);
-          String filePattern = args[2].replace("*", "");
+          String filePattern = args[2].replaceAll("\\*", "");
           Arrays.stream(inputDir.listFiles())
             .filter(f -> f.getName().contains(filePattern))
             .forEach(f -> main.syncTimes(f));
         }
       }    
-      if (args[0].equalsIgnoreCase("name")) {
+      if (args[0].contains("name")) {
         if (args.length < 3 || args[1].isEmpty() || args[2].isEmpty()) {
           System.out.format("\tNo file(s) specified... try \"help\" command for instructions.\n");
         } else {
           File inputDir = new File(args[1]);
-          String filePattern = args[2].replace("*", "");
+          String filePattern = args[2].replaceAll("\\*", "");
           Arrays.stream(inputDir.listFiles())
             .filter(f -> f.getName().contains(filePattern))
             .forEach(f -> main.syncName(f));
@@ -118,13 +118,13 @@ public class SyncFile2EXIF {
       Optional<Tag> o_dateTime = StreamSupport.stream(metadata.getDirectories().spliterator(), false)
         .flatMap(d -> d.getTags().stream())
         .distinct()
-        //.forEach(t -> System.out.format("[%s] = |%s|\n", t.getTagName(), t.getDescription()));
+        //.forEach(t -> System.out.format("[%s] = |%s|\n", t.getTagName(), t.getDescription()))
         .filter(t -> t.getTagName().equalsIgnoreCase("Date/Time Original"))
         .findFirst();    
       if (o_dateTime.isPresent()) {
         String exifDateTimeString = o_dateTime.get().getDescription();
         DateFormat exifDateTimeStringFormat = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");  
-        exifDateTimeStringFormat.setTimeZone(TimeZone.getTimeZone("UTC"));                  
+        exifDateTimeStringFormat.setTimeZone(TimeZone.getTimeZone("Europe/Rome"));                  
         exifDateTime = exifDateTimeStringFormat.parse(exifDateTimeString);         
       }
       return exifDateTime;
