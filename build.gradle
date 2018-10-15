@@ -33,7 +33,11 @@ jar {
 }
 
 test {
-  testLogging.showStandardStreams = true
+    testLogging {
+        outputs.upToDateWhen {false}
+        showStandardStreams = true
+        exceptionFormat = 'full'
+    }
 }
 
 repositories {    
