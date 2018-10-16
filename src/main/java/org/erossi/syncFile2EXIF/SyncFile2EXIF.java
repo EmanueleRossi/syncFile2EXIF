@@ -20,7 +20,6 @@ import java.util.stream.StreamSupport;
 
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
 
@@ -98,7 +97,7 @@ public class SyncFile2EXIF {
           BasicFileAttributeView inputFileView = Files.getFileAttributeView(Paths.get(inputFile.getAbsolutePath()), BasicFileAttributeView.class);
           inputFileView.setTimes(FileTime.fromMillis(date.getTime()), FileTime.fromMillis(date.getTime()), FileTime.fromMillis(date.getTime()));
         } else {
-          System.out.format("%s |%s| %s |%s|", "Cannot find \"Date/Time Original\" tag into EXIF metadata of file", inputFile.getAbsolutePath());          
+          System.out.format("%s |%s|", "Cannot find \"Date/Time Original\" tag into EXIF metadata of file", inputFile.getAbsolutePath());          
         }
       } catch (IOException ioe) {
         System.err.format("%s %s |%s|", "ERROR! Reading file :(", ioe, inputFile.getAbsolutePath());        
