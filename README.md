@@ -11,6 +11,3 @@ Syncronizes file attributes, for pics, with corresponding information from EXIF 
 			 ex.: java -jar <jarFileName> setTimes . .jpg 20181225120000
  ````` 
 Please, feel free to contact me for any question, including bugs ;) or feature request.
-
-Do you like this tool?
-Help Me to buy my new iMac Pro... https://paypal.me/pools/c/87tFPSDruR
