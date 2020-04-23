@@ -57,7 +57,7 @@ public class SyncFile2EXIF {
         System.out.format("\t\t [command] -> setTimes java -jar <jarFileName> setTimes <directory> <fileNamePattern> <yyyyMMddHHmmss>\n");   
         System.out.format("\t\t\t ex.: java -jar <jarFileName> setTimes . .jpg 20181225120000\n");          
       }
-      if (args[0].contains("times")) {
+      if (args[0].contentEquals("times")) {
         if (args.length < 3 || args[1].isEmpty() || args[2].isEmpty()) {
           System.out.format("\tNo file(s) specified... try \"help\" command for instructions.\n");
         } else {
@@ -68,7 +68,7 @@ public class SyncFile2EXIF {
             .forEach(f -> main.setTimes(f, main.getEXIFOriginalDateTime(f)));
         }
       }    
-      if (args[0].contains("timesXMP")) {
+      if (args[0].contentEquals("timesXMP")) {
         if (args.length < 3 || args[1].isEmpty() || args[2].isEmpty()) {
           System.out.format("\tNo file(s) specified... try \"help\" command for instructions.\n");
         } else {
@@ -79,7 +79,7 @@ public class SyncFile2EXIF {
             .forEach(f -> main.setTimes(f, main.getDateCreatedFromXMP(f)));
         }
       }       
-      if (args[0].contains("name")) {
+      if (args[0].contentEquals("name")) {
         if (args.length < 3 || args[1].isEmpty() || args[2].isEmpty()) { 
           System.out.format("\tNo file(s) specified... try \"help\" command for instructions.\n");
         } else {      
@@ -90,7 +90,7 @@ public class SyncFile2EXIF {
             .forEach(f -> main.setName(f, main.getEXIFOriginalDateTime(f)));          
         }
       } 
-      if (args[0].contains("setTimes")) {
+      if (args[0].contentEquals("setTimes")) {
         if (args.length < 3 || args[1].isEmpty() || args[2].isEmpty() || args[3].isEmpty()) {
           System.out.format("\tNo file(s) specified... try \"help\" command for instructions.\n");
         } else {
@@ -177,15 +177,17 @@ public class SyncFile2EXIF {
     public Date getDateCreatedFromXMP(File f) {
       Date exifDateCreated = null;
       try {
-        File xmpFile = new File(f.getPath().replace(FilenameUtils.getExtension(f.getAbsolutePath()), "xmp"));
+        File xmpFile = new File(f.getCanonicalPath().replace(FilenameUtils.getExtension(f.getCanonicalPath()), "xmp"));
         XMPMeta xmpMeta = XMPMetaFactory.parse(new FileInputStream(xmpFile));
         XMPDateTime xmpDateTime = xmpMeta.getPropertyDate("http://ns.adobe.com/photoshop/1.0/", "DateCreated");
         exifDateCreated = xmpDateTime.getCalendar().getTime();
       } catch (XMPException xe) {
         System.err.format("%s %s |%s|", "ERROR! Reading XMP file :(", xe, f.getAbsolutePath());        
       } catch (FileNotFoundException fnf) {
-        System.err.format("%s %s |%s|", "ERROR! Reading file :(", fnf, f.getAbsolutePath());        
-      } 
+        System.err.format("%s %s |%s|", "ERROR! File Not Found :(", fnf, f.getAbsolutePath());        
+      } catch (IOException ioe) {
+        System.err.format("%s %s |%s|", "ERROR! Reading file :(", ioe, f.getAbsolutePath());        
+      }
       return exifDateCreated;
     }
 }
