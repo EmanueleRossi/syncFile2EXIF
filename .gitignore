@@ -31,6 +31,9 @@ hs_err_pid*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+.classpath
+.project
+.settings/
 
 ### Gradle ###
 .gradle

@@ -5,6 +5,8 @@ Syncronizes file attributes, for pics, with corresponding information from EXIF 
 		 [command] -> help
 		 [command] -> times java -jar <jarFileName> times <directory> <fileNamePattern>
 			 ex.: java -jar <jarFileName> times . .jpg
+		 [command] -> timesXMP java -jar <jarFileName> timesXMP <directory> <fileNamePattern>
+			 ex.: java -jar <jarFileName> timesXMP . .jpg			 
 		 [command] -> name java -jar <jarFileName> name <directory> <fileNamePattern>
 			 ex.: java -jar <jarFileName> name . .jpg
 		 [command] -> setTimes java -jar <jarFileName> setTimes <directory> <fileNamePattern> <yyyyMMddHHmmss>

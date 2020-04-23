@@ -49,7 +49,9 @@ public class SyncFile2EXIF {
         System.out.format("\tUsage: java -jar <jarFileName> [command] [parameters]\n");
         System.out.format("\t\t [command] -> help\n");   
         System.out.format("\t\t [command] -> times java -jar <jarFileName> times <directory> <fileNamePattern>\n");   
-        System.out.format("\t\t\t ex.: java -jar <jarFileName> times . .jpg\n");     
+        System.out.format("\t\t\t ex.: java -jar <jarFileName> timesXMP . .jpg\n");     
+        System.out.format("\t\t [command] -> timesXMP java -jar <jarFileName> times <directory> <fileNamePattern>\n");   
+        System.out.format("\t\t\t ex.: java -jar <jarFileName> timesXMP . .jpg\n");            
         System.out.format("\t\t [command] -> name java -jar <jarFileName> name <directory> <fileNamePattern>\n");   
         System.out.format("\t\t\t ex.: java -jar <jarFileName> name . .jpg\n");                       
         System.out.format("\t\t [command] -> setTimes java -jar <jarFileName> setTimes <directory> <fileNamePattern> <yyyyMMddHHmmss>\n");   
