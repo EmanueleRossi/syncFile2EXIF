@@ -1,6 +1,8 @@
 package org.erossi.syncFile2EXIF;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,6 +20,10 @@ import java.util.TimeZone;
 import java.util.jar.JarInputStream;
 import java.util.stream.StreamSupport;
 
+import com.adobe.xmp.XMPDateTime;
+import com.adobe.xmp.XMPException;
+import com.adobe.xmp.XMPMeta;
+import com.adobe.xmp.XMPMetaFactory;
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Metadata;
@@ -60,6 +66,17 @@ public class SyncFile2EXIF {
             .forEach(f -> main.setTimes(f, main.getEXIFOriginalDateTime(f)));
         }
       }    
+      if (args[0].contains("timesXMP")) {
+        if (args.length < 3 || args[1].isEmpty() || args[2].isEmpty()) {
+          System.out.format("\tNo file(s) specified... try \"help\" command for instructions.\n");
+        } else {
+          File inputDir = new File(args[1]);
+          String filePattern = args[2];
+          Arrays.stream(inputDir.listFiles())
+            .filter(f -> f.getName().contains(filePattern))
+            .forEach(f -> main.setTimes(f, main.getDateCreatedFromXMP(f)));
+        }
+      }       
       if (args[0].contains("name")) {
         if (args.length < 3 || args[1].isEmpty() || args[2].isEmpty()) { 
           System.out.format("\tNo file(s) specified... try \"help\" command for instructions.\n");
@@ -97,7 +114,7 @@ public class SyncFile2EXIF {
           BasicFileAttributeView inputFileView = Files.getFileAttributeView(Paths.get(inputFile.getAbsolutePath()), BasicFileAttributeView.class);
           inputFileView.setTimes(FileTime.fromMillis(date.getTime()), FileTime.fromMillis(date.getTime()), FileTime.fromMillis(date.getTime()));
         } else {
-          System.out.format("%s |%s|", "Cannot find \"Date/Time Original\" tag into EXIF metadata of file", inputFile.getAbsolutePath());          
+          System.out.format("%s |%s|", "Can't update file times with {null} date!");          
         }
       } catch (IOException ioe) {
         System.err.format("%s %s |%s|", "ERROR! Reading file :(", ioe, inputFile.getAbsolutePath());        
@@ -131,7 +148,6 @@ public class SyncFile2EXIF {
 
     public Date getEXIFOriginalDateTime(File f) {
       Date exifDateTime = null;
-
       try {
         Metadata metadata = ImageMetadataReader.readMetadata(f);      
         Optional<Tag> o_dateTime = StreamSupport.stream(metadata.getDirectories().spliterator(), false)
@@ -154,5 +170,20 @@ public class SyncFile2EXIF {
         System.err.format("%s %s |%s|", "ERROR! Reading file :(", ioe, f.getAbsolutePath());        
       } 
       return exifDateTime;
+    }
+
+    public Date getDateCreatedFromXMP(File f) {
+      Date exifDateCreated = null;
+      try {
+        File xmpFile = new File(f.getPath().replace(FilenameUtils.getExtension(f.getAbsolutePath()), "xmp"));
+        XMPMeta xmpMeta = XMPMetaFactory.parse(new FileInputStream(xmpFile));
+        XMPDateTime xmpDateTime = xmpMeta.getPropertyDate("http://ns.adobe.com/photoshop/1.0/", "DateCreated");
+        exifDateCreated = xmpDateTime.getCalendar().getTime();
+      } catch (XMPException xe) {
+        System.err.format("%s %s |%s|", "ERROR! Reading XMP file :(", xe, f.getAbsolutePath());        
+      } catch (FileNotFoundException fnf) {
+        System.err.format("%s %s |%s|", "ERROR! Reading file :(", fnf, f.getAbsolutePath());        
+      } 
+      return exifDateCreated;
     }
 }
